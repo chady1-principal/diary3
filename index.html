@@ -1,0 +1,1785 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#f7f4ed">
+    <meta name="description" content="하루의 마음을 차분히 기록하는 나만의 일기장">
+    <title>오늘의 기록 — 나의 일기장</title>
+    <style>
+      :root {
+        color-scheme: light;
+        font-family: "Malgun Gothic", "Apple SD Gothic Neo", sans-serif;
+        font-synthesis: none;
+        text-rendering: optimizeLegibility;
+        -webkit-font-smoothing: antialiased;
+        --ink: #29372f;
+        --muted: #788177;
+        --paper: #f7f4ed;
+        --card: #fffefa;
+        --line: #e7e4da;
+        --green: #426a50;
+        --green-dark: #34543f;
+        --green-pale: #e9f0e8;
+        --peach: #f5e5d8;
+        --orange: #f47b00;
+        --toolbar: #303235;
+        --danger: #a3473e;
+        --shadow: 0 16px 45px rgb(55 60 45 / 7%);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        min-width: 320px;
+        min-height: 100vh;
+        min-height: 100dvh;
+        margin: 0;
+        padding-bottom: 5.5rem;
+        color: var(--ink);
+        background: #565656;
+      }
+
+      button,
+      input,
+      textarea {
+        font: inherit;
+      }
+
+      button {
+        cursor: pointer;
+        touch-action: manipulation;
+      }
+
+      button:focus-visible,
+      input:focus-visible,
+      textarea:focus-visible {
+        outline: 3px solid #8aaa91;
+        outline-offset: 3px;
+      }
+
+      .page {
+        width: min(760px, 100%);
+        margin-inline: auto;
+        padding: 0 1.25rem;
+        background: #fff;
+        min-height: 100vh;
+        min-height: 100dvh;
+        box-shadow: 0 0 32px rgb(0 0 0 / 18%);
+      }
+
+      .masthead {
+        display: flex;
+        align-items: center;
+        justify-content: stretch;
+        gap: 0;
+        min-height: 5rem;
+        margin: 0 -1.25rem;
+        padding: 0.55rem 1rem;
+        color: #fff;
+        background: linear-gradient(#3e4043, #292b2e);
+        border-block: 2px dashed #a8a8a8;
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 0.55rem;
+      }
+
+      .brand-mark {
+        width: 3.4rem;
+        height: 3.4rem;
+        display: grid;
+        place-items: center;
+        color: #fff;
+        font-size: 2.8rem;
+        font-weight: 800;
+      }
+
+      .brand-name {
+        margin: 0;
+        color: #fff;
+        font-size: 1.35rem;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+      }
+
+      .brand-caption {
+        display: none;
+      }
+
+      .today-label {
+        display: none;
+      }
+
+      .toolbar {
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        margin-left: auto;
+      }
+
+      .toolbar-button {
+        min-width: 3.25rem;
+        min-height: 3.25rem;
+        display: grid;
+        place-items: center;
+        padding: 0.35rem;
+        border: 0;
+        border-radius: 0.55rem;
+        color: #fff;
+        background: var(--orange);
+        font-size: 1.45rem;
+        font-weight: 800;
+      }
+
+      .toolbar-button:hover {
+        background: #dc6c00;
+      }
+
+      .toolbar-button.add {
+        min-width: 5rem;
+        margin-right: 0.3rem;
+        background: transparent;
+        font-size: 1rem;
+      }
+
+      .toolbar-button.back {
+        min-width: 2rem;
+        background: transparent;
+        font-size: 1.8rem;
+      }
+
+      .layout {
+        padding: 0.8rem 0 1.25rem;
+      }
+
+      .card {
+        border: 0;
+        border-radius: 0;
+        background: #fff;
+        box-shadow: none;
+      }
+
+      .editor {
+        padding: 0;
+      }
+
+      .section-heading {
+        display: none;
+      }
+
+      .section-heading h2 {
+        margin: 0;
+        font-size: 1.2rem;
+        letter-spacing: -0.04em;
+      }
+
+      .editor-title {
+        display: contents;
+        min-width: 0;
+      }
+
+      .date-location-controls {
+        grid-column: 1 / -1;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+      }
+
+      .date-picker {
+        display: block;
+        color: inherit;
+      }
+
+      .date-calendar input {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        clip-path: inset(50%);
+        border: 0;
+      }
+
+      .date-display {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        align-items: center;
+        column-gap: 0.65rem;
+        padding: 0.2rem 0 0.85rem;
+        border-bottom: 2px dotted #222;
+      }
+
+      .mood-button {
+        width: 3.7rem;
+        height: 3.7rem;
+        padding: 0;
+        border: 0;
+        border-right: 2px dotted #777;
+        background: transparent;
+        font-size: 2.8rem;
+      }
+
+      .date-information {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        align-items: center;
+      }
+
+      .date-calendar {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        align-items: center;
+        column-gap: 0.65rem;
+        min-width: 0;
+        cursor: pointer;
+      }
+
+      .date-day {
+        grid-row: span 2;
+        color: var(--orange);
+        font-size: clamp(3.2rem, 13vw, 5.25rem);
+        font-weight: 800;
+        line-height: 0.95;
+      }
+
+      .date-weekday {
+        align-self: end;
+        color: #171717;
+        font-size: clamp(1.1rem, 5vw, 1.8rem);
+        font-weight: 500;
+        line-height: 1;
+      }
+
+      .date-month {
+        color: #111;
+        font-size: clamp(1.45rem, 6vw, 2.25rem);
+        font-weight: 800;
+        line-height: 1.15;
+        white-space: nowrap;
+      }
+
+      .date-year {
+        color: var(--orange);
+        font-size: 0.65em;
+      }
+
+      .date-time {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+        color: #111;
+        font-size: clamp(1.5rem, 6vw, 2.35rem);
+        white-space: nowrap;
+      }
+
+      .date-period {
+        align-self: start;
+        font-size: 0.9em;
+      }
+
+      .date-time-value {
+        align-self: end;
+        padding-bottom: 0.18rem;
+        font-size: 0.78em;
+      }
+
+      .date-location-controls {
+        display: contents;
+      }
+
+      .location-menu {
+        display: none;
+      }
+
+      .heading-actions {
+        display: none;
+      }
+
+      .location-menu {
+        position: relative;
+      }
+
+      .location-menu summary {
+        min-height: 2.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.35rem;
+        padding: 0.45rem 0.7rem;
+        border: 1px solid var(--line);
+        border-radius: 0.75rem;
+        color: var(--green);
+        background: var(--green-pale);
+        font-size: 0.88rem;
+        font-weight: 700;
+        list-style: none;
+        cursor: pointer;
+        touch-action: manipulation;
+      }
+
+      .location-menu summary::-webkit-details-marker {
+        display: none;
+      }
+
+      .location-menu summary::after {
+        content: "⌄";
+      }
+
+      .location-menu[open] summary::after {
+        content: "⌃";
+      }
+
+      .location-menu summary:focus-visible {
+        outline: 3px solid #8aaa91;
+        outline-offset: 3px;
+      }
+
+      .location-menu-panel {
+        position: absolute;
+        z-index: 6;
+        top: calc(100% + 0.5rem);
+        left: 0;
+        width: min(360px, calc(100vw - 2rem));
+        padding: 1rem;
+        border: 1px solid var(--line);
+        border-radius: 1rem;
+        background: var(--card);
+        box-shadow: var(--shadow);
+      }
+
+      .location-menu-panel .field {
+        margin-bottom: 0.5rem;
+      }
+
+      .entries-menu {
+        position: relative;
+      }
+
+      .entries-menu summary {
+        min-height: 2.75rem;
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        padding: 0.55rem 0.8rem;
+        border: 1px solid var(--line);
+        border-radius: 0.8rem;
+        color: var(--green);
+        background: var(--green-pale);
+        font-size: 0.9rem;
+        font-weight: 700;
+        list-style: none;
+        cursor: pointer;
+        touch-action: manipulation;
+      }
+
+      .entries-menu summary::-webkit-details-marker {
+        display: none;
+      }
+
+      .entries-menu summary::after {
+        content: "⌄";
+        font-size: 1rem;
+      }
+
+      .entries-menu[open] summary::after {
+        content: "⌃";
+      }
+
+      .entries-menu summary:focus-visible {
+        outline: 3px solid #8aaa91;
+        outline-offset: 3px;
+      }
+
+      .toolbar .entries-menu summary {
+        min-width: 3.25rem;
+        min-height: 3.25rem;
+        justify-content: center;
+        padding: 0.35rem;
+        border: 0;
+        border-radius: 0.55rem;
+        color: #fff;
+        background: var(--orange);
+        font-size: 1.15rem;
+      }
+
+      .toolbar .entries-menu .entry-count {
+        color: #fff;
+        font-size: 0.8rem;
+      }
+
+      .entries-menu-panel {
+        position: absolute;
+        z-index: 5;
+        top: calc(100% + 0.5rem);
+        right: 0;
+        width: min(360px, calc(100vw - 2rem));
+        padding: 1rem;
+        border: 1px solid var(--line);
+        border-radius: 1rem;
+        background: var(--card);
+        box-shadow: var(--shadow);
+      }
+
+      .entries-menu-panel > .field {
+        margin-bottom: 0.75rem;
+      }
+
+      .entry-list {
+        display: grid;
+        gap: 0.6rem;
+        max-height: min(45vh, 340px);
+        overflow: auto;
+        padding-right: 0.15rem;
+      }
+
+      .entry-count {
+        color: var(--muted);
+        font-size: 0.9rem;
+      }
+
+      .field-row {
+        display: grid;
+        grid-template-columns: minmax(0, 0.75fr) minmax(0, 1.25fr);
+        gap: 0.75rem;
+      }
+
+      .field {
+        display: grid;
+        gap: 0.45rem;
+        margin-bottom: 1rem;
+      }
+
+      .field label {
+        font-size: 1.35rem;
+        font-weight: 700;
+      }
+
+      .visually-hidden {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        clip-path: inset(50%);
+        border: 0;
+      }
+
+      .field-label {
+        font-size: 1.35rem;
+        font-weight: 700;
+      }
+
+      input,
+      textarea {
+        width: 100%;
+        border: 1px solid var(--line);
+        border-radius: 0.85rem;
+        color: var(--ink);
+        background: #fffefa;
+      }
+
+      input {
+        min-width: 0;
+        min-height: 4rem;
+        padding: 0.7rem 0.85rem;
+      }
+
+      textarea {
+        min-height: 17rem;
+        padding: 0.85rem;
+        line-height: 1.65;
+        resize: vertical;
+      }
+
+      #entry-title,
+      #entry-body {
+        border-color: #aaa;
+        border-radius: 0.45rem;
+        font-size: clamp(1.5rem, 5.5vw, 2.6rem);
+      }
+
+      #entry-title {
+        min-height: 5.2rem;
+      }
+
+      #entry-body {
+        min-height: 17rem;
+      }
+
+      select {
+        width: 100%;
+        min-height: 3.65rem;
+        padding: 0.55rem 0.8rem;
+        border: 1px solid #aaa;
+        border-radius: 0.5rem;
+        color: #171717;
+        background: #fff;
+        font: inherit;
+        font-size: 1.15rem;
+      }
+
+      .choice-row {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 3.6rem;
+        align-items: end;
+        gap: 0.65rem;
+      }
+
+      .choice-row .field {
+        min-width: 0;
+        margin-bottom: 0;
+      }
+
+      .add-choice {
+        min-width: 3.6rem;
+        min-height: 3.6rem;
+        padding: 0;
+        border: 1px solid #aaa;
+        border-radius: 0.5rem;
+        color: var(--toolbar);
+        background: #fff;
+        font-size: 2rem;
+        line-height: 1;
+      }
+
+      .location-actions {
+        display: grid;
+        gap: 0.65rem;
+      }
+
+      .wide-action {
+        width: 100%;
+        min-height: 3.6rem;
+        border: 1px solid #aaa;
+        border-radius: 0.5rem;
+        color: #171717;
+        background: #fff;
+        font-size: clamp(1.2rem, 4.7vw, 1.9rem);
+        font-weight: 500;
+      }
+
+      .wide-action:hover {
+        background: #f5f5f5;
+      }
+
+      .word-count-bar {
+        position: fixed;
+        z-index: 10;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        width: min(760px, 100%);
+        min-height: 4.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        margin-inline: auto;
+        padding: 0.6rem 1rem;
+        border-top: 2px dashed #aaa;
+        color: #fff;
+        background: linear-gradient(#3e4043, #292b2e);
+      }
+
+      .word-count-bar .back {
+        min-width: 3rem;
+        min-height: 3rem;
+        border-radius: 0.5rem;
+        color: #fff;
+        background: var(--orange);
+      }
+
+      .word-count {
+        flex: 1;
+        text-align: center;
+        font-size: 1rem;
+        line-height: 1.35;
+      }
+
+      .word-count strong {
+        color: #fff;
+      }
+
+      .count-value {
+        display: inline-block;
+        min-width: 2ch;
+        text-align: right;
+      }
+
+      .bottom-save {
+        min-width: 3.5rem;
+        min-height: 3.5rem;
+        border: 0;
+        border-radius: 0.55rem;
+        color: #fff;
+        background: var(--orange);
+        font-size: 1.8rem;
+        font-weight: 800;
+      }
+
+      input[type="file"] {
+        min-height: auto;
+        padding: 0.65rem;
+        background: #fffefa;
+      }
+
+      .location-controls,
+      .photo-controls {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+      }
+
+      .location-controls input {
+        min-width: 0;
+        flex: 1;
+      }
+
+      .location-button {
+        flex: 0 0 auto;
+      }
+
+      .photo-controls .button {
+        flex: 1;
+      }
+
+      input[type="file"]::file-selector-button {
+        min-height: 2.3rem;
+        margin-right: 0.75rem;
+        padding: 0.4rem 0.75rem;
+        border: 1px solid var(--line);
+        border-radius: 0.6rem;
+        color: var(--ink);
+        background: var(--paper);
+        font: inherit;
+        font-weight: 700;
+        cursor: pointer;
+      }
+
+      .field-hint {
+        margin: 0;
+        color: var(--muted);
+        font-size: 0.8rem;
+        line-height: 1.5;
+      }
+
+      .location-actions .field-hint {
+        padding-inline: 0.15rem;
+      }
+
+      .photo-previews {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(64px, 80px));
+        gap: 0.5rem;
+      }
+
+      .photo-preview {
+        position: relative;
+        overflow: hidden;
+        aspect-ratio: 1;
+        border: 1px solid var(--line);
+        border-radius: 0.8rem;
+        background: var(--paper);
+      }
+
+      .photo-preview img {
+        width: 100%;
+        height: 100%;
+        display: block;
+        object-fit: cover;
+      }
+
+      .photo-remove {
+        position: absolute;
+        top: 0.35rem;
+        right: 0.35rem;
+        width: 2rem;
+        height: 2rem;
+        padding: 0;
+        border: 1px solid rgb(255 255 255 / 75%);
+        border-radius: 50%;
+        color: #fff;
+        background: rgb(41 55 47 / 82%);
+        font-size: 1.2rem;
+        line-height: 1;
+      }
+
+      input::placeholder,
+      textarea::placeholder {
+        color: #9b9f95;
+      }
+
+      .editor-footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        flex-wrap: wrap;
+      }
+
+      .privacy-note {
+        margin: 0;
+        color: var(--muted);
+        font-size: 0.8rem;
+        line-height: 1.5;
+      }
+
+      .button-row {
+        display: flex;
+        gap: 0.6rem;
+      }
+
+      .button {
+        min-height: 2.9rem;
+        padding: 0.65rem 1rem;
+        border: 1px solid transparent;
+        border-radius: 0.8rem;
+        font-weight: 700;
+        transition: background-color 150ms ease, border-color 150ms ease;
+      }
+
+      .button:disabled {
+        opacity: 0.6;
+        cursor: wait;
+      }
+
+      .button-primary {
+        color: #fff;
+        background: var(--green);
+      }
+
+      .button-primary:hover {
+        background: var(--green-dark);
+      }
+
+      .button-secondary {
+        border-color: var(--line);
+        color: var(--ink);
+        background: transparent;
+      }
+
+      .button-secondary:hover {
+        background: var(--paper);
+      }
+
+      .button-danger {
+        border-color: #ead5d1;
+        color: var(--danger);
+        background: #fff9f7;
+      }
+
+      .button-danger:hover {
+        background: #f8eae6;
+      }
+
+      .entries {
+        padding: clamp(1.25rem, 4vw, 2rem);
+      }
+
+      .entry-item {
+        width: 100%;
+        padding: 1rem;
+        border: 1px solid transparent;
+        border-radius: 1rem;
+        color: inherit;
+        background: #faf9f4;
+        text-align: left;
+      }
+
+      .entry-item:hover,
+      .entry-item[aria-current="true"] {
+        border-color: #cfddcd;
+        background: var(--green-pale);
+      }
+
+      .entry-item-date {
+        display: block;
+        margin-bottom: 0.4rem;
+        color: var(--green);
+        font-size: 0.78rem;
+        font-weight: 800;
+      }
+
+      .entry-item-title {
+        display: block;
+        overflow: hidden;
+        font-size: 1rem;
+        font-weight: 800;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .entry-item-preview {
+        display: -webkit-box;
+        overflow: hidden;
+        margin-top: 0.35rem;
+        color: var(--muted);
+        font-size: 0.86rem;
+        line-height: 1.5;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+      }
+
+      .entry-item-location {
+        display: block;
+        margin-top: 0.4rem;
+        color: var(--green);
+        font-size: 0.8rem;
+      }
+
+      .entry-item-photo {
+        width: 100%;
+        max-height: 150px;
+        display: block;
+        margin-top: 0.7rem;
+        border-radius: 0.65rem;
+        object-fit: cover;
+      }
+
+      .empty-state {
+        padding: 2.5rem 1rem;
+        color: var(--muted);
+        text-align: center;
+      }
+
+      .empty-icon {
+        display: block;
+        margin-bottom: 0.8rem;
+        font-size: 2rem;
+      }
+
+      .empty-state p {
+        margin: 0;
+        line-height: 1.7;
+      }
+
+      .status {
+        min-height: 1.5rem;
+        margin: 0.75rem 0 0;
+        color: var(--green);
+        font-size: 0.85rem;
+      }
+
+      .status.error {
+        color: var(--danger);
+      }
+
+      .delete-button {
+        padding-inline: 0.75rem;
+        color: var(--danger);
+      }
+
+      [hidden] {
+        display: none !important;
+      }
+
+      @media (max-width: 760px) {
+        .page {
+          padding: 0 1rem;
+        }
+
+        .masthead {
+          margin-right: -1rem;
+          margin-bottom: 0;
+          margin-left: -1rem;
+        }
+
+        .brand-mark {
+          width: 2.8rem;
+          height: 2.8rem;
+        }
+
+        .brand-caption {
+          display: none;
+        }
+
+        .editor {
+          padding: 0;
+          border-radius: 0;
+        }
+
+        .section-heading {
+          display: block;
+          margin-bottom: 0;
+        }
+
+        .date-location-controls {
+          display: flex;
+          gap: 0.45rem;
+        }
+
+        .date-picker {
+          display: none;
+        }
+
+        .location-menu {
+          display: none;
+        }
+
+        .date-display {
+          display: grid;
+        }
+
+        .field label {
+          font-size: 1.2rem;
+        }
+
+        .field-label {
+          font-size: 1.2rem;
+        }
+
+        .field {
+          margin-bottom: 0.8rem;
+        }
+
+        #entry-body {
+          min-height: 15rem;
+        }
+
+        .status {
+          margin-top: 0.3rem;
+        }
+      }
+
+      @media (max-width: 460px) {
+        .masthead {
+          min-height: 4.25rem;
+          padding-inline: 0.55rem;
+        }
+
+        .brand {
+          gap: 0.2rem;
+        }
+
+        .brand-mark {
+          width: 2.25rem;
+          height: 2.7rem;
+          font-size: 2.35rem;
+        }
+
+        .brand-name {
+          font-size: 1rem;
+        }
+
+        .toolbar {
+          gap: 0.25rem;
+        }
+
+        .toolbar-button {
+          min-width: 2.65rem;
+          min-height: 2.65rem;
+          font-size: 1.15rem;
+        }
+
+        .toolbar-button.add {
+          min-width: 3.3rem;
+          font-size: 0.85rem;
+        }
+
+        .toolbar .entries-menu summary {
+          min-width: 2.65rem;
+          min-height: 2.65rem;
+        }
+
+        .page {
+          padding-inline: 0.85rem;
+        }
+
+        .date-display {
+          column-gap: 0.45rem;
+          padding-bottom: 0.65rem;
+        }
+
+        .mood-button {
+          width: 3rem;
+          height: 3rem;
+          font-size: 2.25rem;
+        }
+
+        .date-calendar {
+          column-gap: 0.4rem;
+        }
+
+        .date-day {
+          font-size: clamp(3rem, 14vw, 4.3rem);
+        }
+
+        .date-weekday {
+          font-size: clamp(0.95rem, 4.5vw, 1.3rem);
+        }
+
+        .date-month {
+          font-size: clamp(1.2rem, 5.8vw, 1.8rem);
+        }
+
+        .date-time {
+          font-size: clamp(1.2rem, 5vw, 1.7rem);
+        }
+
+        #entry-title {
+          min-height: 4.5rem;
+          font-size: 1.8rem;
+        }
+
+        #entry-body {
+          min-height: 13rem;
+          font-size: 1.65rem;
+        }
+
+        .word-count-bar {
+          min-height: 4rem;
+          padding-inline: 0.65rem;
+        }
+
+        .bottom-save {
+          min-width: 3rem;
+          min-height: 3rem;
+        }
+
+        .add-choice {
+          min-width: 3.25rem;
+          min-height: 3.25rem;
+        }
+
+        select {
+          min-height: 3.25rem;
+        }
+
+        .wide-action {
+          min-height: 3.25rem;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          scroll-behavior: auto !important;
+          transition-duration: 0.01ms !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="page">
+      <header class="masthead">
+        <button class="toolbar-button back" id="new-entry" type="button" aria-label="새 일기">‹</button>
+        <div class="brand">
+          <span class="brand-mark" aria-hidden="true">✎</span>
+          <p class="brand-name">DIARY</p>
+        </div>
+        <nav class="toolbar" aria-label="일기 도구">
+          <button class="toolbar-button add" id="toolbar-save" type="submit" form="entry-form">ADD</button>
+          <button class="toolbar-button" id="take-photo" type="button" aria-label="카메라로 촬영">📷</button>
+          <button class="toolbar-button" id="choose-photos" type="button" aria-label="갤러리에서 선택">▧</button>
+          <details class="entries-menu" id="entries-menu">
+            <summary aria-label="지난 기록 열기"><span aria-hidden="true">↶</span><span class="entry-count" id="entry-count">0</span></summary>
+            <div class="entries-menu-panel">
+              <label class="field search" for="search-entry">
+                <span>지난 기록 찾기</span>
+                <input id="search-entry" type="search" placeholder="제목이나 내용 검색">
+              </label>
+              <div class="entry-list" id="entry-list"></div>
+              <div class="empty-state" id="empty-state">
+                <span class="empty-icon" aria-hidden="true">☁</span>
+                <p class="empty-copy">아직 기록이 없어요.
+오늘의 이야기를 첫 일기로 남겨보세요.</p>
+              </div>
+            </div>
+          </details>
+        </nav>
+      </header>
+
+      <div class="layout">
+        <section class="card editor" aria-labelledby="editor-heading">
+          <div class="date-display">
+            <button class="mood-button" id="mood-button" type="button" aria-label="기분 선택">🙂</button>
+            <div class="date-information">
+              <label class="date-picker date-calendar" for="entry-date" aria-label="날짜 선택">
+                <input id="entry-date" name="date" type="date" form="entry-form" required>
+                <span class="date-day" id="date-day">2</span>
+                <span class="date-weekday" id="date-weekday">FRIDAY</span>
+                <span class="date-month" id="date-month">OCTOBER <span class="date-year">2026</span></span>
+              </label>
+              <div class="date-time">
+                <span class="date-period" id="date-period">오후</span>
+                <time class="date-time-value" id="clock-time"></time>
+              </div>
+            </div>
+          </div>
+          <form id="entry-form">
+            <div class="field">
+              <label class="visually-hidden" for="entry-title">제목</label>
+              <input id="entry-title" name="title" maxlength="80" placeholder="Enter title of entry" required>
+            </div>
+            <div class="field">
+              <label class="visually-hidden" for="entry-body">오늘의 이야기</label>
+              <textarea id="entry-body" name="body" maxlength="10000" placeholder="Type here" required></textarea>
+            </div>
+            <div class="field">
+              <label for="entry-category">Select category:</label>
+              <div class="choice-row">
+                <select id="entry-category" name="category" aria-label="카테고리">
+                  <option>일상</option>
+                  <option>가족</option>
+                  <option>친구</option>
+                  <option>건강</option>
+                  <option>여행</option>
+                  <option>취미</option>
+                  <option>감사</option>
+                  <option>자동차</option>
+                </select>
+                <button class="add-choice" id="add-category" type="button" aria-label="카테고리 추가">+</button>
+              </div>
+            </div>
+            <div class="field">
+              <label for="entry-tags">Select Tags:</label>
+              <div class="choice-row">
+                <select id="entry-tags" name="tags" aria-label="태그 선택" multiple size="1"></select>
+                <button class="add-choice" id="add-tag" type="button" aria-label="태그 추가">+</button>
+              </div>
+            </div>
+            <div class="field">
+              <label class="visually-hidden" for="entry-location">장소</label>
+              <div class="location-actions">
+                <input id="entry-location" name="location" maxlength="120" placeholder="장소 (선택)">
+                <button class="wide-action" id="current-location" type="button">Get my location</button>
+                <button class="wide-action" id="get-weather" type="button">Get current weather by location</button>
+                <p class="field-hint" id="weather-result" role="status"></p>
+                  <p class="field-hint">GPS 좌표는 장소 이름 조회를 위해 OpenStreetMap, 날씨 조회를 위해 Open-Meteo에 전달됩니다.</p>
+              </div>
+            </div>
+            <div class="field">
+              <span class="field-label">사진 <span class="entry-count">(최대 4장)</span></span>
+              <input id="camera-input" name="camera" type="file" accept="image/*" capture="environment" hidden>
+              <input id="gallery-input" name="gallery" type="file" accept="image/*" multiple hidden>
+              <p class="field-hint">사진은 저장 공간을 아끼도록 크기를 줄여 이 기기에 저장합니다.</p>
+              <div class="photo-previews" id="photo-previews" aria-label="첨부한 사진"></div>
+            </div>
+            <div class="editor-footer">
+              <p class="privacy-note">일기와 사진은 이 기기의 브라우저에 저장됩니다.</p>
+              <div class="button-row">
+                <button class="button button-danger delete-button" id="delete-entry" type="button" hidden>삭제</button>
+                <button class="button button-secondary" id="cancel-edit" type="button" hidden>취소</button>
+              </div>
+            </div>
+          </form>
+          <p class="status" id="status" role="status" aria-live="polite"></p>
+        </section>
+      </div>
+    </main>
+    <footer class="word-count-bar">
+      <button class="toolbar-button back" id="clear-entry" type="button" aria-label="작성 내용 지우기">↶</button>
+      <div class="word-count">
+        <div>Symbols: <strong class="count-value" id="symbol-count">0</strong></div>
+        <div>Words: <strong class="count-value" id="word-count">0</strong></div>
+      </div>
+      <button class="bottom-save" id="save-entry" type="submit" form="entry-form" aria-label="일기 저장">✓</button>
+    </footer>
+
+    <script>
+      const STORAGE_KEY = "oneul-ui-ilgi-v1";
+      const form = document.querySelector("#entry-form");
+      const dateInput = document.querySelector("#entry-date");
+      const titleInput = document.querySelector("#entry-title");
+      const locationInput = document.querySelector("#entry-location");
+      const bodyInput = document.querySelector("#entry-body");
+      const categoryInput = document.querySelector("#entry-category");
+      const tagsInput = document.querySelector("#entry-tags");
+      const cameraInput = document.querySelector("#camera-input");
+      const galleryInput = document.querySelector("#gallery-input");
+      const currentLocationButton = document.querySelector("#current-location");
+      const weatherButton = document.querySelector("#get-weather");
+      const weatherResult = document.querySelector("#weather-result");
+      const photoPreviews = document.querySelector("#photo-previews");
+      const listElement = document.querySelector("#entry-list");
+      const emptyState = document.querySelector("#empty-state");
+      const statusElement = document.querySelector("#status");
+      const saveButton = document.querySelector("#save-entry");
+      const cancelButton = document.querySelector("#cancel-edit");
+      const deleteButton = document.querySelector("#delete-entry");
+      const searchInput = document.querySelector("#search-entry");
+      const entryCount = document.querySelector("#entry-count");
+      const entriesMenu = document.querySelector("#entries-menu");
+      const moodButton = document.querySelector("#mood-button");
+      const moods = ["🙂", "😄", "😌", "😔", "😴", "😍"];
+      let mood = moods[0];
+      let entries = loadEntries();
+      let editingId = null;
+      let photos = [];
+
+      function localDateString(date = new Date()) {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const day = String(date.getDate()).padStart(2, "0");
+        return `${year}-${month}-${day}`;
+      }
+
+      function formatDate(dateString, options = { year: "numeric", month: "long", day: "numeric", weekday: "short" }) {
+        const [year, month, day] = dateString.split("-").map(Number);
+        return new Intl.DateTimeFormat("ko-KR", options).format(new Date(year, month - 1, day));
+      }
+
+      function updateDateDisplay() {
+        if (!dateInput.value) return;
+        const [year, month, day] = dateInput.value.split("-").map(Number);
+        const selectedDate = new Date(year, month - 1, day);
+        document.querySelector("#date-day").textContent = String(day);
+        document.querySelector("#date-weekday").textContent = new Intl.DateTimeFormat("en-US", {
+          weekday: "long"
+        }).format(selectedDate).toUpperCase();
+        const monthName = new Intl.DateTimeFormat("en-US", { month: "long" })
+          .format(selectedDate).toUpperCase();
+        document.querySelector("#date-month").replaceChildren(
+          document.createTextNode(`${monthName} `),
+          Object.assign(document.createElement("span"), {
+            className: "date-year",
+            textContent: String(year)
+          })
+        );
+      }
+
+      function updateClock() {
+        const now = new Date();
+        document.querySelector("#clock-time").textContent = new Intl.DateTimeFormat("en-US", {
+          hour: "numeric",
+          minute: "2-digit",
+          hour12: false
+        }).format(now);
+        document.querySelector("#date-period").textContent =
+          new Intl.DateTimeFormat("ko-KR", { hour: "numeric", hour12: true })
+            .formatToParts(now)
+            .find((part) => part.type === "dayPeriod")?.value ?? "";
+        document.querySelector("#clock-time").dateTime = now.toISOString();
+      }
+
+      function updateCounts() {
+        const text = bodyInput.value;
+        document.querySelector("#symbol-count").textContent = String(Array.from(text).length);
+        document.querySelector("#word-count").textContent =
+          String(text.trim() ? text.trim().split(/\s+/).length : 0);
+      }
+
+      function addOption(select, value) {
+        const normalizedValue = value.trim();
+        if (!normalizedValue) return null;
+        const existing = Array.from(select.options).find((option) =>
+          option.value.toLocaleLowerCase("ko") === normalizedValue.toLocaleLowerCase("ko")
+        );
+        if (existing) return existing;
+        const option = document.createElement("option");
+        option.textContent = normalizedValue;
+        option.value = normalizedValue;
+        select.append(option);
+        return option;
+      }
+
+      function loadEntries() {
+        try {
+          const stored = localStorage.getItem(STORAGE_KEY);
+          if (!stored) return [];
+          const parsed = JSON.parse(stored);
+          if (!Array.isArray(parsed) || parsed.some((entry) =>
+            !entry || typeof entry.id !== "string" || typeof entry.date !== "string" ||
+            typeof entry.title !== "string" || typeof entry.body !== "string"
+          )) {
+            throw new Error("저장된 일기 형식이 올바르지 않습니다.");
+          }
+          return parsed.map((entry) => {
+            const savedPhotos = entry.photos ?? [];
+            if (typeof entry.location !== "undefined" && typeof entry.location !== "string") {
+              throw new Error("저장된 장소 정보가 올바르지 않습니다.");
+            }
+            if (!Array.isArray(savedPhotos) || savedPhotos.some((photo) =>
+              typeof photo !== "string" || !photo.startsWith("data:image/jpeg;base64,")
+            )) {
+              throw new Error("저장된 사진 정보가 올바르지 않습니다.");
+            }
+            if (typeof entry.category !== "undefined" && typeof entry.category !== "string") {
+              throw new Error("저장된 카테고리 정보가 올바르지 않습니다.");
+            }
+            const tags = entry.tags ?? [];
+            if (!Array.isArray(tags) || tags.some((tag) => typeof tag !== "string")) {
+              throw new Error("저장된 태그 정보가 올바르지 않습니다.");
+            }
+            return {
+              ...entry,
+              location: entry.location ?? "",
+              photos: savedPhotos,
+              category: entry.category ?? "일상",
+              tags,
+              mood: moods.includes(entry.mood) ? entry.mood : moods[0]
+            };
+          });
+        } catch (error) {
+          window.setTimeout(() => showStatus(`일기를 불러오지 못했습니다: ${error.message}`, true), 0);
+          return [];
+        }
+      }
+
+      function saveEntries(nextEntries) {
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(nextEntries));
+          entries = nextEntries;
+          showStatus("일기를 이 기기에 저장했어요.");
+          return true;
+        } catch (error) {
+          showStatus(`저장하지 못했습니다: ${error.message}`, true);
+          return false;
+        }
+      }
+
+      function showStatus(message, isError = false) {
+        statusElement.textContent = message;
+        statusElement.classList.toggle("error", isError);
+      }
+
+      function clearPhotos() {
+        for (const photo of photos) {
+          if (photo.previewUrl) URL.revokeObjectURL(photo.previewUrl);
+        }
+        photos = [];
+        cameraInput.value = "";
+        galleryInput.value = "";
+        renderPhotoPreviews();
+      }
+
+      function renderPhotoPreviews() {
+        const previews = photos.map((photo, index) => {
+          const wrapper = document.createElement("div");
+          wrapper.className = "photo-preview";
+
+          const image = document.createElement("img");
+          image.src = photo.previewUrl ?? photo.dataUrl;
+          image.alt = `첨부 사진 ${index + 1}`;
+
+          const removeButton = document.createElement("button");
+          removeButton.type = "button";
+          removeButton.className = "photo-remove";
+          removeButton.textContent = "×";
+          removeButton.setAttribute("aria-label", `사진 ${index + 1} 삭제`);
+          removeButton.addEventListener("click", () => {
+            const [removed] = photos.splice(index, 1);
+            if (removed.previewUrl) URL.revokeObjectURL(removed.previewUrl);
+            renderPhotoPreviews();
+          });
+
+          wrapper.append(image, removeButton);
+          return wrapper;
+        });
+        photoPreviews.replaceChildren(...previews);
+      }
+
+      function compressPhoto(file) {
+        return new Promise((resolve, reject) => {
+          const sourceUrl = URL.createObjectURL(file);
+          const image = new Image();
+          image.onload = () => {
+            try {
+              const maxDimension = 1200;
+              const scale = Math.min(1, maxDimension / Math.max(image.naturalWidth, image.naturalHeight));
+              const canvas = document.createElement("canvas");
+              canvas.width = Math.max(1, Math.round(image.naturalWidth * scale));
+              canvas.height = Math.max(1, Math.round(image.naturalHeight * scale));
+              const context = canvas.getContext("2d");
+              if (!context) throw new Error("사진을 처리할 수 없습니다.");
+              context.drawImage(image, 0, 0, canvas.width, canvas.height);
+              canvas.toBlob((blob) => {
+                URL.revokeObjectURL(sourceUrl);
+                if (!blob) {
+                  reject(new Error("사진을 압축하지 못했습니다."));
+                  return;
+                }
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = () => reject(new Error("사진을 읽지 못했습니다."));
+                reader.readAsDataURL(blob);
+              }, "image/jpeg", 0.78);
+            } catch (error) {
+              URL.revokeObjectURL(sourceUrl);
+              reject(error);
+            }
+          };
+          image.onerror = () => {
+            URL.revokeObjectURL(sourceUrl);
+            reject(new Error(`"${file.name}" 사진을 열지 못했습니다.`));
+          };
+          image.src = sourceUrl;
+        });
+      }
+
+      function findCurrentPlace() {
+        if (!navigator.geolocation) {
+          showStatus("이 브라우저에서는 GPS 위치 기능을 사용할 수 없습니다.", true);
+          return;
+        }
+        if (!window.isSecureContext) {
+          showStatus("GPS를 사용하려면 HTTPS 또는 localhost에서 이 일기장을 열어 주세요.", true);
+          return;
+        }
+
+        currentLocationButton.disabled = true;
+        currentLocationButton.textContent = "위치 확인 중…";
+        showStatus("현재 위치를 확인하고 있어요. 브라우저의 위치 권한을 허용해 주세요.");
+        navigator.geolocation.getCurrentPosition(async (position) => {
+          const { latitude, longitude } = position.coords;
+          try {
+            const params = new URLSearchParams({
+              format: "jsonv2",
+              lat: String(latitude),
+              lon: String(longitude),
+              zoom: "18",
+              "accept-language": "ko"
+            });
+            const response = await fetch(`https://nominatim.openstreetmap.org/reverse?${params}`);
+            if (!response.ok) {
+              throw new Error(`장소 이름을 조회하지 못했습니다 (HTTP ${response.status}).`);
+            }
+            const place = await response.json();
+            if (typeof place.display_name !== "string" || !place.display_name) {
+              throw new Error("이 위치의 장소 이름을 찾지 못했습니다.");
+            }
+            const address = place.address ?? {};
+            const parts = [
+              place.name || address.amenity || address.tourism || address.shop,
+              address.neighbourhood || address.suburb || address.city_district,
+              address.city || address.town || address.village || address.county
+            ].filter((part, index, all) => part && all.indexOf(part) === index);
+            locationInput.value = (parts.length ? parts : place.display_name.split(", ").slice(0, 3))
+              .join(", ")
+              .slice(0, 120);
+            showStatus("현재 위치를 장소에 입력했어요.");
+          } catch (error) {
+            locationInput.value = `${latitude.toFixed(5)}, ${longitude.toFixed(5)}`;
+            showStatus(`장소 이름 조회에 실패해 GPS 좌표를 입력했습니다. (${error.message})`, true);
+          } finally {
+            currentLocationButton.disabled = false;
+            currentLocationButton.textContent = "Get my location";
+          }
+        }, (error) => {
+          const messages = {
+            1: "위치 권한을 허용해야 현재 장소를 확인할 수 있어요.",
+            2: "현재 위치를 확인할 수 없습니다. GPS나 기기 위치 설정을 확인해 주세요.",
+            3: "위치 확인 시간이 초과되었습니다. 다시 시도해 주세요."
+          };
+          showStatus(messages[error.code] ?? `위치를 확인하지 못했습니다: ${error.message}`, true);
+          currentLocationButton.disabled = false;
+          currentLocationButton.textContent = "Get my location";
+        }, {
+          enableHighAccuracy: false,
+          timeout: 15000,
+          maximumAge: 300000
+        });
+      }
+
+      function getCurrentCoordinates() {
+        return new Promise((resolve, reject) => {
+          if (!navigator.geolocation) {
+            reject(new Error("이 브라우저에서는 GPS 위치 기능을 사용할 수 없습니다."));
+            return;
+          }
+          if (!window.isSecureContext) {
+            reject(new Error("GPS를 사용하려면 HTTPS 또는 localhost에서 열어 주세요."));
+            return;
+          }
+          navigator.geolocation.getCurrentPosition(
+            ({ coords }) => resolve(coords),
+            (error) => reject(new Error(error.code === 1
+              ? "날씨를 확인하려면 위치 권한을 허용해 주세요."
+              : error.code === 3
+                ? "위치 확인 시간이 초과되었습니다. 다시 시도해 주세요."
+                : "현재 위치를 확인할 수 없습니다.")),
+            { enableHighAccuracy: false, timeout: 15000, maximumAge: 300000 }
+          );
+        });
+      }
+
+      async function getCurrentWeather() {
+        weatherButton.disabled = true;
+        weatherButton.textContent = "날씨 확인 중…";
+        weatherResult.textContent = "";
+        try {
+          const coords = await getCurrentCoordinates();
+          const params = new URLSearchParams({
+            latitude: String(coords.latitude),
+            longitude: String(coords.longitude),
+            current: "temperature_2m,weather_code",
+            timezone: "auto"
+          });
+          const response = await fetch(`https://api.open-meteo.com/v1/forecast?${params}`);
+          if (!response.ok) throw new Error(`날씨를 가져오지 못했습니다 (HTTP ${response.status}).`);
+          const data = await response.json();
+          const current = data.current;
+          if (!current || typeof current.temperature_2m !== "number") {
+            throw new Error("현재 날씨 정보가 없습니다.");
+          }
+          const descriptions = {
+            0: "맑음", 1: "대체로 맑음", 2: "구름 조금", 3: "흐림",
+            45: "안개", 48: "안개", 51: "이슬비", 53: "이슬비", 55: "이슬비",
+            61: "비", 63: "비", 65: "강한 비", 71: "눈", 73: "눈", 75: "강한 눈",
+            80: "소나기", 81: "소나기", 82: "강한 소나기", 95: "뇌우",
+            96: "우박을 동반한 뇌우", 99: "우박을 동반한 뇌우"
+          };
+          const description = descriptions[current.weather_code] ?? "날씨 정보";
+          weatherResult.textContent = `현재 날씨: ${description}, ${Math.round(current.temperature_2m)}°C`;
+          showStatus("현재 위치의 날씨를 확인했어요.");
+        } catch (error) {
+          weatherResult.textContent = error.message;
+          showStatus(error.message, true);
+        } finally {
+          weatherButton.disabled = false;
+          weatherButton.textContent = "Get current weather by location";
+        }
+      }
+
+      function createEntryButton(entry) {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "entry-item";
+        button.setAttribute("aria-current", String(entry.id === editingId));
+
+        const date = document.createElement("span");
+        date.className = "entry-item-date";
+        date.textContent = formatDate(entry.date);
+
+        const title = document.createElement("span");
+        title.className = "entry-item-title";
+        title.textContent = entry.title;
+
+        const preview = document.createElement("span");
+        preview.className = "entry-item-preview";
+        preview.textContent = entry.body;
+
+        button.append(date, title, preview);
+        const details = [entry.category, ...(entry.tags ?? [])].filter(Boolean);
+        if (details.length) {
+          const metadata = document.createElement("span");
+          metadata.className = "entry-item-location";
+          metadata.textContent = details.join(" · ");
+          button.append(metadata);
+        }
+        if (entry.location) {
+          const location = document.createElement("span");
+          location.className = "entry-item-location";
+          location.textContent = `📍 ${entry.location}`;
+          button.append(location);
+        }
+        if (entry.photos?.length) {
+          const image = document.createElement("img");
+          image.className = "entry-item-photo";
+          image.src = entry.photos[0];
+          image.alt = `${entry.title} 일기 사진`;
+          button.append(image);
+        }
+        button.addEventListener("click", () => beginEdit(entry));
+        return button;
+      }
+
+      function renderEntries() {
+        const query = searchInput.value.trim().toLocaleLowerCase("ko");
+        const filtered = [...entries]
+          .sort((a, b) => b.date.localeCompare(a.date) || b.updatedAt - a.updatedAt)
+          .filter((entry) =>
+            `${entry.title} ${entry.body} ${entry.location} ${entry.category} ${(entry.tags ?? []).join(" ")}`
+              .toLocaleLowerCase("ko").includes(query)
+          );
+
+        listElement.replaceChildren(...filtered.map(createEntryButton));
+        emptyState.hidden = filtered.length > 0;
+        entryCount.textContent = `${entries.length}편`;
+        emptyState.querySelector(".empty-copy").textContent = entries.length === 0
+          ? "아직 기록이 없어요.\n오늘의 이야기를 첫 일기로 남겨보세요."
+          : "검색 결과가 없어요. 다른 낱말로 찾아보세요.";
+      }
+
+      function resetEditor() {
+        editingId = null;
+        form.reset();
+        dateInput.value = localDateString();
+        locationInput.value = "";
+        categoryInput.value = "일상";
+        Array.from(tagsInput.options).forEach((option) => { option.selected = false; });
+        mood = moods[0];
+        moodButton.textContent = mood;
+        weatherResult.textContent = "";
+        clearPhotos();
+        cancelButton.hidden = true;
+        deleteButton.hidden = true;
+        updateDateDisplay();
+        updateCounts();
+        renderEntries();
+      }
+
+      function beginEdit(entry) {
+        entriesMenu.open = false;
+        editingId = entry.id;
+        dateInput.value = entry.date;
+        titleInput.value = entry.title;
+        locationInput.value = entry.location ?? "";
+        bodyInput.value = entry.body;
+        categoryInput.value = addOption(categoryInput, entry.category ?? "일상").value;
+        const selectedTags = new Set(entry.tags ?? []);
+        for (const tag of selectedTags) addOption(tagsInput, tag);
+        Array.from(tagsInput.options).forEach((option) => { option.selected = selectedTags.has(option.value); });
+        mood = entry.mood ?? moods[0];
+        moodButton.textContent = mood;
+        clearPhotos();
+        photos = (entry.photos ?? []).map((dataUrl) => ({ dataUrl }));
+        renderPhotoPreviews();
+        cancelButton.hidden = false;
+        deleteButton.hidden = false;
+        showStatus("");
+        renderEntries();
+        titleInput.focus();
+        updateDateDisplay();
+        updateCounts();
+      }
+
+      dateInput.value = localDateString();
+      for (const entry of entries) {
+        addOption(categoryInput, entry.category ?? "일상");
+        for (const tag of entry.tags ?? []) addOption(tagsInput, tag);
+      }
+      for (const tag of ["가족", "친구", "산책", "음식", "여행", "행복", "감사"]) addOption(tagsInput, tag);
+      updateDateDisplay();
+      updateClock();
+      updateCounts();
+      window.setInterval(updateClock, 1000);
+
+      form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const title = titleInput.value.trim();
+        const location = locationInput.value.trim();
+        const body = bodyInput.value.trim();
+        if (!title || !body || !dateInput.value) {
+          showStatus("날짜, 제목, 오늘의 이야기를 모두 입력해 주세요.", true);
+          return;
+        }
+
+        saveButton.disabled = true;
+        showStatus("일기를 저장하고 있어요.");
+        try {
+          const savedPhotos = await Promise.all(photos.map((photo) =>
+            photo.file ? compressPhoto(photo.file) : photo.dataUrl
+          ));
+          const now = Date.now();
+          const existing = entries.find((entry) => entry.id === editingId);
+          const entry = {
+            id: existing ? existing.id : (crypto.randomUUID?.() ?? `${now}-${Math.random().toString(36).slice(2)}`),
+            date: dateInput.value,
+            title,
+            location,
+            body,
+            category: categoryInput.value,
+            tags: Array.from(tagsInput.selectedOptions, (option) => option.value),
+            mood,
+            photos: savedPhotos,
+            updatedAt: now
+          };
+          const nextEntries = existing
+            ? entries.map((item) => item.id === existing.id ? entry : item)
+            : [...entries, entry];
+
+          if (saveEntries(nextEntries)) {
+            resetEditor();
+            renderEntries();
+          }
+        } catch (error) {
+          showStatus(`사진을 저장하지 못했습니다: ${error.message}`, true);
+        } finally {
+          saveButton.disabled = false;
+        }
+      });
+
+      cancelButton.addEventListener("click", () => {
+        resetEditor();
+        showStatus("수정을 취소했어요.");
+      });
+
+      deleteButton.addEventListener("click", () => {
+        if (!editingId) return;
+        const entry = entries.find((item) => item.id === editingId);
+        if (!entry || !window.confirm(`"${entry.title}" 일기를 삭제할까요?`)) return;
+        const nextEntries = entries.filter((item) => item.id !== editingId);
+        if (saveEntries(nextEntries)) resetEditor();
+      });
+
+      searchInput.addEventListener("input", renderEntries);
+
+      dateInput.addEventListener("change", updateDateDisplay);
+      bodyInput.addEventListener("input", updateCounts);
+      document.querySelector("#mood-button").addEventListener("click", () => {
+        const currentIndex = moods.indexOf(mood);
+        mood = moods[(currentIndex + 1) % moods.length];
+        moodButton.textContent = mood;
+        moodButton.setAttribute("aria-label", `기분 선택: ${mood}`);
+      });
+
+      document.querySelector("#add-category").addEventListener("click", () => {
+        const value = window.prompt("추가할 카테고리를 입력하세요.");
+        if (!value) return;
+        const option = addOption(categoryInput, value);
+        if (option) categoryInput.value = option.value;
+      });
+
+      document.querySelector("#add-tag").addEventListener("click", () => {
+        const value = window.prompt("추가할 태그를 입력하세요.");
+        if (!value) return;
+        const option = addOption(tagsInput, value);
+        if (option) option.selected = true;
+      });
+
+      document.querySelector("#new-entry").addEventListener("click", () => {
+        if ((titleInput.value.trim() || bodyInput.value.trim()) &&
+            !window.confirm("작성 중인 내용을 지우고 새 일기를 쓸까요?")) return;
+        resetEditor();
+        showStatus("새 일기를 작성합니다.");
+        titleInput.focus();
+      });
+
+      document.querySelector("#clear-entry").addEventListener("click", () => {
+        if ((titleInput.value.trim() || bodyInput.value.trim()) &&
+            !window.confirm("작성 중인 내용을 지울까요?")) return;
+        resetEditor();
+        showStatus("작성 내용을 지웠어요.");
+      });
+
+      document.querySelector("#get-weather").addEventListener("click", getCurrentWeather);
+
+      function addSelectedPhotos(fileInput) {
+        const selected = Array.from(fileInput.files ?? []);
+        fileInput.value = "";
+        if (selected.some((file) => !file.type.startsWith("image/"))) {
+          showStatus("이미지 파일만 첨부할 수 있어요.", true);
+          return;
+        }
+        if (photos.length + selected.length > 4) {
+          showStatus("일기 한 편에는 사진을 최대 4장까지 첨부할 수 있어요.", true);
+          return;
+        }
+        photos.push(...selected.map((file) => ({
+          file,
+          previewUrl: URL.createObjectURL(file)
+        })));
+        renderPhotoPreviews();
+        showStatus(selected.length ? `사진 ${selected.length}장을 추가했어요.` : "");
+      }
+
+      document.querySelector("#take-photo").addEventListener("click", () => cameraInput.click());
+      document.querySelector("#choose-photos").addEventListener("click", () => galleryInput.click());
+      cameraInput.addEventListener("change", () => addSelectedPhotos(cameraInput));
+      galleryInput.addEventListener("change", () => addSelectedPhotos(galleryInput));
+      currentLocationButton.addEventListener("click", findCurrentPlace);
+
+      renderEntries();
+    </script>
+  </body>
+</html>
